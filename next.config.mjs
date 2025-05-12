@@ -17,12 +17,13 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  // Enable standalone output for Docker
-  output: 'standalone',
-  // Ensure CSS is properly included in the build
-  experimental: {
-    optimizeCss: true,
-  },
+  // Remove standalone output for now to simplify build
+  // output: 'standalone',
+  
+  // Remove experimental features
+  // experimental: {
+  //   optimizeCss: true,
+  // },
 };
 
 export default nextConfig;

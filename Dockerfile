@@ -1,15 +1,14 @@
-# Stage 1: Dependencies
-FROM node:18-alpine AS deps
+FROM node:18.18.0-alpine AS deps
 WORKDIR /app
 
 # Copy package files
 COPY package.json ./
 
-# Install dependencies with legacy-peer-deps flag to bypass dependency conflicts
-RUN npm install --legacy-peer-deps
+# Install dependencies with more verbose logging
+RUN npm install --legacy-peer-deps --verbose
 
-# Stage 2: Builder
-FROM node:18-alpine AS builder
+# Builder stage
+FROM node:18.18.0-alpine AS builder
 WORKDIR /app
 
 # Copy dependencies
@@ -17,25 +16,25 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy project files
 COPY . .
 
-# Build the application
-RUN npm run build
+# Add more verbose logging during build
+RUN echo "Starting build process..." && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
-# Stage 3: Runner
-FROM node:18-alpine AS runner
+# Runner stage
+FROM node:18.18.0-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
 
 # Create a non-root user to run the app
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-# Make sure to copy CSS files
-COPY --from=builder /app/app/globals.css ./app/globals.css
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 # Set proper ownership
 RUN chown -R nextjs:nodejs /app
@@ -48,6 +47,7 @@ EXPOSE 3000
 
 # Set hostname
 ENV HOSTNAME "0.0.0.0"
+ENV PORT 3000
 
 # Start the application
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
