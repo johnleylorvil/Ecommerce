@@ -5,8 +5,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 
-# Install dependencies (using npm install instead of npm ci)
-RUN npm install
+# Install dependencies with legacy-peer-deps flag to bypass dependency conflicts
+RUN npm install --legacy-peer-deps
 
 # Stage 2: Builder
 FROM node:18-alpine AS builder
