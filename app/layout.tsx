@@ -11,7 +11,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "ShopSimple - Simple Ecommerce",
   description: "A simple ecommerce interface",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -20,7 +19,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Ensure styles are loaded */}
+        <link rel="stylesheet" href="/app/globals.css" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <CartProvider>

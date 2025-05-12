@@ -34,6 +34,8 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# Make sure to copy CSS files
+COPY --from=builder /app/app/globals.css ./app/globals.css
 
 # Set proper ownership
 RUN chown -R nextjs:nodejs /app
